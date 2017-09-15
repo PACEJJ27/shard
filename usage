@@ -1,0 +1,110 @@
+用法
+
+　　参数列表：
+
+Shard (1.5) 有三种运行模式:
+
+1) 单用户、单密码、          - 使用 -u 和 -p
+
+2) 单用户、多密码            - 使用 -u 和 -f
+
+3) 多用户、多密码            - 只使用 -f
+
+在这里https://github.com/philwantsfish/shard/wiki查看更详细的用例。
+
+用法: java -jar shard-1.5.jar [options]
+
+  -u, --username <value>  要测试的用户名
+
+  -p, --password <value>  要测试的密码
+
+  -f, --file <value>      包含用户名和口令的文件的路径
+
+  --format <value>        登录凭证的格式。必须包含两组正则表达式。第一组中是用户名，第二组是密码。默认匹配下面的格式:
+
+        "username":"password"
+
+  -l, --list              列出模块
+
+  -v, --version           打印版本号
+
+  --modules <value>       运行特定模块。逗号分隔的列表
+
+  --help                  打印使用方法
+
+模块列表：
+
+$ java -jar shard.jar -l
+
+Available modules:
+
+        Facebook
+
+        LinkedIn
+
+        Reddit
+
+        Twitter
+
+        Instagram
+
+        GitHub
+
+        BitBucket
+
+        Kijiji
+
+        DigitalOcean
+
+        Vimeo
+
+        Laposte
+
+        DailyMotion
+
+例子
+
+提供一个用户名和口令，shard就会尝试登录多个网站：
+
+ 
+
+$ java -jar shard.jar -u username-here -p password-here
+
+21:16:25.950 [+] Running in single credential mode
+
+21:16:30.302 [+] username-here:password-here - Reddit, Instagram
+
+可以提供一个文件测试多个登录凭证。默认是一行一组登录凭证，格式为”username”:”password”。可以使用–format参数指定格式
+
+$ java -jar shard.jar -f /tmp/creds.txt
+
+21:16:39.501 [+] Running in multi-credential mode
+
+21:16:39.516 [+] Parsed 2 credentials
+
+21:16:42.794 [+] username1:password1 - Reddit, Instagram
+
+21:16:45.189 [+] username2:password2 - Facebook, LinkedIn, Twitter
+
+这里有已经使用sbt编译过的版本。
+
+也可以自己使用sbt编译，sbt assembly
+
+开发新的模块
+
+增加新的模块很容易。创建一个继承module package中的AbstractModule的新类，并将之添加到ModuleFactory中即可。
+
+AbstractModule有一个抽象方法：
+
+def tryLogin(creds: Credentials): Boolean
+
+这个方法接收一个Credentials对象作为参数，返回一个布尔值，表明是否登录成功。可以将TwitterModule作为模板。在这里了解更多对增加新模块的说明。
+
+依赖库：
+
+使用JSoup进行HTTP通信和HTML解析
+
+使用spray-json处理json
+
+如果你不熟悉Scala，可以查看secondary_implementations文件夹中的内容。这里面是使用其它语言写的shard。
+如果你在这里面增加了一个模块，我会用Scala重写一个，增加到主工程里面。
